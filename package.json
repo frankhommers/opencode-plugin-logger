@@ -1,6 +1,6 @@
 {
   "name": "@frankhommers/opencode-plugin-logger",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "type": "module",
   "description": "A JSONL session event logger plugin for OpenCode",
   "main": "./dist/index.js",

@@ -35,7 +35,7 @@ Example:
   "logger": {
     "enabled": true,
     "scopes": [],
-    "dir": "${project}/.opencode/logs/sessions"
+    "dir": "${project}/.agent-session-logs"
   }
 }
 ```
@@ -60,7 +60,7 @@ Supported placeholders:
 Logs are organized by session:
 
 ```
-.opencode/logs/sessions/
+.agent-session-logs/
   2026-03-20-fix-auth-bug/
     main.jsonl              # Main session events
     explore-ses_abc.jsonl   # Subagent events

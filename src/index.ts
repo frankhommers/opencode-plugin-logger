@@ -33,7 +33,7 @@ const DEFAULT_SETTINGS: PluginSettings = {
   logger: {
     enabled: false,
     scopes: [],
-    dir: ".opencode/logs/sessions",
+    dir: ".agent-session-logs",
   },
 }
 

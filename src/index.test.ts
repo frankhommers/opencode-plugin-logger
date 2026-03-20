@@ -86,7 +86,7 @@ describe("session-aware logger", () => {
       },
     )
 
-    const logPath = `${projectDir}/.opencode/logs/sessions/2026-02-21-fix-auth-bug/main.jsonl`
+    const logPath = `${projectDir}/.agent-session-logs/2026-02-21-fix-auth-bug/main.jsonl`
     expect(existsSync(logPath)).toBe(true)
     const text = readFileSync(logPath, "utf-8")
     expect(text).toContain('"event":"chat_message"')
@@ -131,7 +131,7 @@ describe("session-aware logger", () => {
       },
     )
 
-    const logPath = `${projectDir}/.opencode/logs/sessions/2026-02-21-fix-auth-bug/explore-ses_sub.jsonl`
+    const logPath = `${projectDir}/.agent-session-logs/2026-02-21-fix-auth-bug/explore-ses_sub.jsonl`
     expect(existsSync(logPath)).toBe(true)
     const text = readFileSync(logPath, "utf-8")
     expect(text).toContain('"session_id":"ses_sub"')
@@ -176,7 +176,7 @@ describe("session-aware logger", () => {
       },
     )
 
-    const logPath = `${projectDir}/.opencode/logs/sessions/2026-02-21-fix-auth-bug/explore-ses_sub.jsonl`
+    const logPath = `${projectDir}/.agent-session-logs/2026-02-21-fix-auth-bug/explore-ses_sub.jsonl`
     const text = readFileSync(logPath, "utf-8")
     const event = JSON.parse(text.trim()) as { parent_session_id: string | null }
     expect(event.parent_session_id).toBe("ses_main")
@@ -220,7 +220,7 @@ describe("session-aware logger", () => {
       },
     )
 
-    const logPath = `${projectDir}/.opencode/logs/sessions/2026-02-21-fix-auth-bug/subagent-ses_sub.jsonl`
+    const logPath = `${projectDir}/.agent-session-logs/2026-02-21-fix-auth-bug/subagent-ses_sub.jsonl`
     const text = readFileSync(logPath, "utf-8")
     const event = JSON.parse(text.trim()) as { parent_session_id: string | null }
     expect(event.parent_session_id).toBe("ses_main")
@@ -266,7 +266,7 @@ describe("session-aware logger", () => {
       },
     )
 
-    const logPath = `${projectDir}/.opencode/logs/sessions/2026-02-21-fix-auth-bug/subagent-ses_sub.jsonl`
+    const logPath = `${projectDir}/.agent-session-logs/2026-02-21-fix-auth-bug/subagent-ses_sub.jsonl`
     const text = readFileSync(logPath, "utf-8")
     const event = JSON.parse(text.trim()) as { parent_session_id: string | null }
     expect(event.parent_session_id).toBe("ses_main")
