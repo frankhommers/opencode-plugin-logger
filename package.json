@@ -1,0 +1,20 @@
+{
+  "name": "@frankhommers/opencode-plugin-logger",
+  "module": "index.ts",
+  "version": "1.0.0",
+  "author": "Frank Hommers",
+  "repository": "https://github.com/frankhommers/opencode-plugin-logger",
+  "files": [
+    "index.ts",
+    "src"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "devDependencies": {
+    "@opencode-ai/plugin": "^1.0.153",
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
