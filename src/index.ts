@@ -244,7 +244,8 @@ export const LoggerPlugin: Plugin = async (ctx) => {
       const result = await runtime.client.session.get({ path: { id: sessionID } })
       const session = result.data
       if (!session) throw new Error("Session not found")
-      const date = new Date(session.time.created * 1000).toISOString().split("T")[0]
+      const createdMs = session.time.created > 1e12 ? session.time.created : session.time.created * 1000
+      const date = new Date(createdMs).toISOString().split("T")[0]
       const info: SessionInfo = {
         id: session.id,
         title: session.title,
