@@ -1,3 +1,4 @@
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
 import { homedir } from "node:os"
 import { dirname, isAbsolute, join } from "node:path"
 import { type Plugin, tool } from "@opencode-ai/plugin"
@@ -90,11 +91,10 @@ const mergeSettings = (base: PluginSettings, patch?: SettingsFile): PluginSettin
 }
 
 const readSettingsFile = async (filePath: string): Promise<SettingsFile | undefined> => {
-  const file = Bun.file(filePath)
-  if (!(await file.exists())) return undefined
-  const text = await file.text()
-  if (!text.trim()) return undefined
+  if (!existsSync(filePath)) return undefined
   try {
+    const text = readFileSync(filePath, "utf-8")
+    if (!text.trim()) return undefined
     return JSON.parse(text) as SettingsFile
   } catch {
     return undefined
@@ -137,10 +137,9 @@ const loadSettings = async (projectDir: string, config?: unknown): Promise<Plugi
   }
 }
 
-const ensureDir = async (path: string) => {
-  const dir = Bun.file(path)
-  if (!(await dir.exists())) {
-    await Bun.$`mkdir -p ${path}`
+const ensureDir = (path: string) => {
+  if (!existsSync(path)) {
+    mkdirSync(path, { recursive: true })
   }
 }
 
@@ -174,11 +173,11 @@ const makeLoggerTools = (runtime: {
     }
 
     const sessionsDir = `${runtime.settings.logger.dir}/${sessionSlug}`
-    await ensureDir(sessionsDir)
+    ensureDir(sessionsDir)
 
-    const file = Bun.file(`${sessionsDir}/${filename}`)
-    const existing = (await file.exists()) ? await file.text() : ""
-    await Bun.write(file, `${existing}${JSON.stringify(payload)}\n`)
+    const filePath = `${sessionsDir}/${filename}`
+    const existing = existsSync(filePath) ? readFileSync(filePath, "utf-8") : ""
+    writeFileSync(filePath, `${existing}${JSON.stringify(payload)}\n`)
   }
 
   const setLogger = tool({
@@ -195,7 +194,7 @@ const makeLoggerTools = (runtime: {
       const persist = args.persist || "session"
       if (persist !== "session") {
         const target = persist === "project" ? projectSettingsFile(runtime.projectDir) : GLOBAL_SETTINGS_FILE
-        await ensureDir(dirname(target))
+        ensureDir(dirname(target))
         const existing = (await readSettingsFile(target)) || {}
         const merged: SettingsFile = {
           ...existing,
@@ -206,7 +205,7 @@ const makeLoggerTools = (runtime: {
             dir: runtime.settings.logger.dir,
           },
         }
-        await Bun.write(target, `${JSON.stringify(merged, null, 2)}\n`)
+        writeFileSync(target, `${JSON.stringify(merged, null, 2)}\n`)
       }
 
       return `Logger ${runtime.settings.logger.enabled ? "enabled" : "disabled"} (scopes: ${runtime.settings.logger.scopes.length ? runtime.settings.logger.scopes.join(", ") : "all"}, persist: ${persist})`

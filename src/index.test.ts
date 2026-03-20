@@ -1,12 +1,13 @@
-import { mkdir, mkdtemp } from "node:fs/promises"
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
+import { mkdtemp } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { describe, expect, test } from "bun:test"
 import { __test, LoggerPlugin } from "./index"
 
 const writeProjectSettings = async (projectDir: string) => {
-  await mkdir(join(projectDir, ".opencode"), { recursive: true })
-  await Bun.write(
+  mkdirSync(join(projectDir, ".opencode"), { recursive: true })
+  writeFileSync(
     `${projectDir}/.opencode/logger.json`,
     `${JSON.stringify(
       {
@@ -85,9 +86,9 @@ describe("session-aware logger", () => {
       },
     )
 
-    const file = Bun.file(`${projectDir}/.opencode/logs/sessions/2026-02-21-fix-auth-bug/main.jsonl`)
-    expect(await file.exists()).toBe(true)
-    const text = await file.text()
+    const logPath = `${projectDir}/.opencode/logs/sessions/2026-02-21-fix-auth-bug/main.jsonl`
+    expect(existsSync(logPath)).toBe(true)
+    const text = readFileSync(logPath, "utf-8")
     expect(text).toContain('"event":"chat_message"')
   })
 
@@ -130,9 +131,9 @@ describe("session-aware logger", () => {
       },
     )
 
-    const file = Bun.file(`${projectDir}/.opencode/logs/sessions/2026-02-21-fix-auth-bug/explore-ses_sub.jsonl`)
-    expect(await file.exists()).toBe(true)
-    const text = await file.text()
+    const logPath = `${projectDir}/.opencode/logs/sessions/2026-02-21-fix-auth-bug/explore-ses_sub.jsonl`
+    expect(existsSync(logPath)).toBe(true)
+    const text = readFileSync(logPath, "utf-8")
     expect(text).toContain('"session_id":"ses_sub"')
   })
 
@@ -175,8 +176,8 @@ describe("session-aware logger", () => {
       },
     )
 
-    const file = Bun.file(`${projectDir}/.opencode/logs/sessions/2026-02-21-fix-auth-bug/explore-ses_sub.jsonl`)
-    const text = await file.text()
+    const logPath = `${projectDir}/.opencode/logs/sessions/2026-02-21-fix-auth-bug/explore-ses_sub.jsonl`
+    const text = readFileSync(logPath, "utf-8")
     const event = JSON.parse(text.trim()) as { parent_session_id: string | null }
     expect(event.parent_session_id).toBe("ses_main")
   })
@@ -219,8 +220,8 @@ describe("session-aware logger", () => {
       },
     )
 
-    const file = Bun.file(`${projectDir}/.opencode/logs/sessions/2026-02-21-fix-auth-bug/subagent-ses_sub.jsonl`)
-    const text = await file.text()
+    const logPath = `${projectDir}/.opencode/logs/sessions/2026-02-21-fix-auth-bug/subagent-ses_sub.jsonl`
+    const text = readFileSync(logPath, "utf-8")
     const event = JSON.parse(text.trim()) as { parent_session_id: string | null }
     expect(event.parent_session_id).toBe("ses_main")
   })
@@ -265,8 +266,8 @@ describe("session-aware logger", () => {
       },
     )
 
-    const file = Bun.file(`${projectDir}/.opencode/logs/sessions/2026-02-21-fix-auth-bug/subagent-ses_sub.jsonl`)
-    const text = await file.text()
+    const logPath = `${projectDir}/.opencode/logs/sessions/2026-02-21-fix-auth-bug/subagent-ses_sub.jsonl`
+    const text = readFileSync(logPath, "utf-8")
     const event = JSON.parse(text.trim()) as { parent_session_id: string | null }
     expect(event.parent_session_id).toBe("ses_main")
   })
