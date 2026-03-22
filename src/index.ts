@@ -146,6 +146,13 @@ const ensureDir = (path: string) => {
 const slugify = (text: string): string =>
   text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60)
 
+const toMilliseconds = (timestamp: number): number => {
+  if (timestamp < 1e10) return timestamp * 1000    // seconds
+  if (timestamp < 1e13) return timestamp            // milliseconds
+  if (timestamp < 1e16) return timestamp / 1000    // microseconds
+  return timestamp / 1e6                            // nanoseconds
+}
+
 const makeLoggerTools = (runtime: {
   settings: PluginSettings
   sessionAgents: Map<string, string>
@@ -244,7 +251,7 @@ export const LoggerPlugin: Plugin = async (ctx) => {
       const result = await runtime.client.session.get({ path: { id: sessionID } })
       const session = result.data
       if (!session) throw new Error("Session not found")
-      const createdMs = session.time.created > 1e12 ? session.time.created : session.time.created * 1000
+      const createdMs = toMilliseconds(session.time.created)
       const date = new Date(createdMs).toISOString().split("T")[0]
       const info: SessionInfo = {
         id: session.id,
@@ -331,6 +338,7 @@ export default LoggerPlugin
 export const __test = {
   expandTemplate,
   buildLoggerEvent,
+  toMilliseconds,
   settingsFilePaths: (projectDir: string) => ({
     global: GLOBAL_SETTINGS_FILE,
     project: projectSettingsFile(projectDir),

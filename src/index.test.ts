@@ -39,6 +39,28 @@ describe("logger event context", () => {
   })
 })
 
+describe("timestamp conversion", () => {
+  test("converts seconds to milliseconds", () => {
+    const ms = __test.toMilliseconds(1774204952)
+    expect(new Date(ms).toISOString()).toBe("2026-03-22T18:42:32.000Z")
+  })
+
+  test("passes through milliseconds unchanged", () => {
+    const ms = __test.toMilliseconds(1774204952294)
+    expect(new Date(ms).toISOString()).toBe("2026-03-22T18:42:32.294Z")
+  })
+
+  test("converts microseconds to milliseconds", () => {
+    const ms = __test.toMilliseconds(1774204952294000)
+    expect(new Date(ms).toISOString()).toBe("2026-03-22T18:42:32.294Z")
+  })
+
+  test("converts nanoseconds to milliseconds", () => {
+    const ms = __test.toMilliseconds(1774204952294000000)
+    expect(new Date(ms).toISOString()).toBe("2026-03-22T18:42:32.294Z")
+  })
+})
+
 describe("path placeholders", () => {
   test("expands ${project} and ${date}", () => {
     const resolved = __test.expandTemplate("${project}/logs/${date}", "/tmp/repo", "2026-02-20")
@@ -270,5 +292,40 @@ describe("session-aware logger", () => {
     const text = readFileSync(logPath, "utf-8")
     const event = JSON.parse(text.trim()) as { parent_session_id: string | null }
     expect(event.parent_session_id).toBe("ses_main")
+  })
+
+  test("handles microsecond timestamps from session API correctly", async () => {
+    const projectDir = await mkdtemp(join(tmpdir(), "logger-plugin-"))
+    await writeProjectSettings(projectDir)
+    // Microseconds: the actual format OpenCode API returns
+    const createdUs = Date.parse("2026-02-21T00:00:00Z") * 1000
+    const plugin = await LoggerPlugin({
+      directory: projectDir,
+      client: {
+        session: {
+          get: async () => ({
+            data: {
+              id: "ses_us",
+              title: "Microsecond Test",
+              parentID: undefined,
+              time: { created: createdUs },
+            },
+          }),
+        },
+      },
+    } as never)
+
+    await (plugin as any)["chat.message"](
+      {
+        sessionID: "ses_us",
+        agent: "main",
+        messageID: "msg_us",
+        model: { providerID: "openai", modelID: "gpt-5" },
+      },
+      { parts: [] },
+    )
+
+    const logPath = `${projectDir}/.agent-session-logs/2026-02-21-microsecond-test/main.jsonl`
+    expect(existsSync(logPath)).toBe(true)
   })
 })
